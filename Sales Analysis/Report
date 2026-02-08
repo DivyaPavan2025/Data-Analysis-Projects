@@ -1,0 +1,110 @@
+
+Car Sales Dashboard - Project Document
+This document serves as the formal submission for the Power BI Car Sales Dashboard project, detailing its development for dealership's sales performance tracking. It meets all specified KPIs and visualizations for data-driven insights.[1][2]
+Project Overview
+Project Title: Dynamic Car Sales Performance Dashboard
+Objective: Build an interactive Power BI dashboard to monitor YTD/MTD sales KPIs, trends, and distributions across models, styles, colors, regions, and companies.
+Background and Problem Statement
+Your dealership requires real-time visibility into sales metrics to identify growth opportunities. Key challenges addressed:
+•	Track YTD Total Sales, MTD Sales, YoY Growth, and PTYD differences.
+•	Analyze average prices and cars sold with comparable time-based metrics.
+•	Visualize weekly trends, body style/color distributions, regional maps, and detailed grids.[2]
+Scope and Deliverables
+•	Data Model: Sales table + Calendar table for time intelligence.
+•	KPIs: 12 cards (Sales Overview, Avg Price, Cars Sold).
+•	Visuals: 6 charts (line, 2 pies, map, 2 tables).
+•	Interactivity: Slicers for Date/Style/Color/Region.
+•	Output: .PBIX file + .PBIT template for reuse.[3]
+Implementation Details
+Assumes dataset with columns: Date, Model, Body Style, Color, Sales Amount, Dealer Region, Company.
+
+
+
+
+
+
+Note: MTD uses DATESMTD; PTYD uses SAMEPERIODLASTYEAR.
+Visual Layout
+Single-page design (1664×936 canvas, Z-flow reading order).[1]
+Visual Name	Type	Key Fields
+YTD Sales Weekly Trend	Line Chart	X: WeekNum; Y: YTD Sales
+Sales by Body Style	Pie	Legend: Body Style; Values: YTD Sales
+Sales by Color	Pie	Legend: Color; Values: YTD Sales
+Cars Sold by Region	Map	Location: Region; Size: YTD Cars Sold
+Company Sales Grid	Matrix	Rows: Company; Values: YTD Sales
+Details Grid	Table	All columns; Exportable [2]
+
+
+Design Standards Applied
+•	Theme: Branded colors (blues/grays), 8pt grid alignment, hierarchical fonts.
+•	UX: Top-left KPIs, mobile-responsive, no scrolling.
+•	Performance: Optimized queries, importQuery-ready.[4]
+Testing and Validation
+•	Verified KPIs against sample data (e.g., YoY >0% shows green).
+•	Cross-filtering tested across all slicers.
+•	Mobile preview confirmed readability.
+Assumptions and Limitations
+•	Dataset provided separately (Excel/CSV format).
+•	Regions map-compatible (e.g., AU states).
+•	No custom visuals required.
+Conclusion
+This dashboard empowers your team with at-a-glance sales insights, reducing analysis time. Ready for production use upon data import. Contact for .PBIX file or customizations.[5]
+
+Data and DAX Measures
+DAX MEASURES
+YTD Total Sales
+	TOTALYTD([Total Sales], DimDate[Date])
+
+MTD Total Sales	TOTALMTD([Total Sales], DimDate[Date])
+
+PYTD Total Sales
+	CALCULATE([Total Sales], SAMEPERIODLASTYEAR(DimDate[Date]))
+
+Diff_Sales_Tot	[YTD Total Sales]-[PYTD Total Sales]
+Color_SalesTotals	IF([Diff_Sales_Tot]>0, "Green","Red")
+YOY Sales Growth	[Diff_Sales_Tot]/[PYTD Total Sales]
+MTD Sales KPI	CONCATENATE("MTD Total Sales : ",FORMAT([MTD Total Sales]/1000000,"$0.00M"))
+Total Sales	SUM(car_data[Price ($)])
+Max Point Week	IF([Maximum Weekly Total Sales] = [Total Sales], [Maximum Weekly Total Sales],BLANK())
+YTD Avg Price	TOTALYTD([Avg Price],DimDate[Date])
+PYTD Avg Price	CALCULATE(AVERAGE(car_data[Price ($)]),SAMEPERIODLASTYEAR(DimDate[Date]))
+Diff_Price_Avg	[YTD Avg Price] - [PYTD Avg Price]
+Color_AvgPrice	IF([Diff_Price_Avg]>0, "Green","Red")
+YOY Price Growth	[Diff_Price_Avg]/[PYTD Avg Price]
+MTD Avg Price	TOTALMTD(AVERAGE(car_data[Price ($)]),DimDate[Date])
+MTD Avg KPI	CONCATENATE("MTD Average Price : ",FORMAT([MTD Avg Price]/1000,"$0.00K"))
+YTD Car Sold	TOTALYTD([Car Units],DimDate[Date])
+PYTD Cars Sold	CALCULATE(COUNT(car_data[Car_id]),SAMEPERIODLASTYEAR(DimDate[Date]))
+Diff_Cars_Unit	[YTD Car Sold] - [PYTD Cars Sold]
+Avg Price	AVERAGE(car_data[Price ($)])
+Car Units	COUNT(car_data[Car_id])
+Color_Car_units	IF([Diff_Cars_Unit]>0, "Green","Red")
+YOY Cars Growth	[Diff_Cars_Unit]/[YTD Car Sold]
+MTD Num Cars	TOTALMTD([Car Units],DimDate[Date])
+MTD Num Cars KPI	CONCATENATE("MTD Cars Sold Units: ",FORMAT([MTD Num Cars]/1000,"0.00K"))
+Maximum Weekly Total Sales	MAXX(ALLSELECTED(DimDate[WeekNum]), [Total Sales])
+Parameter Value	SELECTEDVALUE('Parameter 2'[Parameter])
+
+CALCULATED COLUMNS
+Column Name	[DataCategory]	Calculated Columnn
+Year	Years	YEAR([Date])
+MonthNo	MonthOfYear	MONTH([Date])
+Month	Months	FORMAT([Date], "MMMM")
+QuarterNo	QuarterOfYear	INT(([MonthNo] + 2) / 3)
+Quarter	Quarters	Qtr  & [QuarterNo]
+Day	DayOfMonth	DAY([Date])
+Year		YEAR(DimDate[Date])
+Month		FORMAT(DimDate[Date],"MMM")
+FullMonth		FORMAT(DimDate[Date],"MMMM")
+WeekDay		FORMAT(DimDate[Date],"dddd")
+WeekNum		WEEKNUM(DimDate[Date])
+Week		WEEKDAY(DimDate[Date])
+Year	Years	YEAR([Date])
+MonthNo	MonthOfYear	MONTH([Date])
+Month	Months	FORMAT([Date], "MMMM")
+QuarterNo	QuarterOfYear	INT(([MonthNo] + 2) / 3)
+Quarter	Quarters	Qtr  & [QuarterNo]
+Day	DayOfMonth	DAY([Date])
+YTD Weekly Max		IF([Max Point Week]=[Total Sales],[Total Sales], BLANK())
+
+
