@@ -176,18 +176,6 @@ powerbi-portfolio/
 - **Tooltips**: Context-rich hover info
 
 
-## 🚀 Deployment Guide
-
-```mermaid
-graph LR
-  A[Download .pbix] --> B[Import Your Data]
-  B --> C[Refresh Relationships]
-  C --> D[Publish to Workspace]
-  D --> E[Configure Gateway]
-  E --> F[Share App/Embed]
-```
-
-
 ## 🤝 Contributing
 
 1. Fork repository
